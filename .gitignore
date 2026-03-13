@@ -33,3 +33,5 @@ Thumbs.db
 # Project-specific generated uploads
 backend/uploads/*
 !backend/uploads/.gitkeep
+
+backend/eng.traineddata
