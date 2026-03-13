@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Official Portal</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .form-container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        h2 { margin-top: 0; color: #111827; }
+        p { color: #6b7280; margin-bottom: 24px; font-size: 14px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 14px; color: #374151; }
+        input[type="text"], input[type="email"] { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; }
+        .checkbox-group { display: flex; align-items: center; justify-content: flex-start; margin-top: 20px; }
+        .checkbox-group input { margin-right: 10px; }
+        button { width: 100%; padding: 12px; background-color: #ec4899; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 24px; }
+        button:hover { background-color: #db2777; }
+        .service-banner { background: #fdf2f8; color: #be185d; padding: 10px; border-radius: 6px; margin-bottom: 20px; font-weight: 600; text-align: center; border: 1px solid #fce7f3; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Official Update Portal</h2>
+        <p>This is a simulated government/bank portal for demonstration purposes.</p>
+        
+        <div class="service-banner" id="serviceBanner">Service requested: <br /><input type="text" id="serviceName" value="Unknown Service" readonly style="background:transparent; border:none; color:inherit; font-weight:bold; text-align:center; width:100%; mt-2" /></div>
+
+        <form onsubmit="event.preventDefault(); alert('Form Submitted Successfully!');">
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" placeholder="Enter full name">
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <label for="address">New Address</label>
+                <input type="text" id="address" placeholder="Enter new address">
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="disclaimer">
+                <label for="disclaimer" style="margin-bottom:0">I declare that the information is correct.</label>
+            </div>
+
+            <button type="submit">Update Details</button>
+        </form>
+    </div>
+</body>
+</html>

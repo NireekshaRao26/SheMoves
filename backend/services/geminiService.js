@@ -27,29 +27,35 @@ const normalizeQuestionnaire = (questionnaire = {}) => ({
 });
 
 const buildPrompt = (userData, questionnaire) => `
-You are generating a personalized relocation document update roadmap for an Indian resident.
+You are a relocation assistant helping an Indian resident update their documents after moving to a new city or making personal changes.
 
 User data:
 ${JSON.stringify(userData, null, 2)}
 
-Questionnaire:
+Questionnaire answers:
 ${JSON.stringify(questionnaire, null, 2)}
 
-Instructions:
-- Return ONLY valid JSON.
-- Return a JSON array.
-- Each array item must contain exactly these fields:
-  - "step": number
-  - "task": string
-  - "description": string
-  - "link": string
-- Choose only tasks that are relevant to the questionnaire answers.
-- Focus on practical relocation-related updates such as Aadhaar, PAN, Passport, Bank KYC, voter ID, driving licence, or other important records when applicable.
-- Use official or widely used government/banking portal links when possible.
-- Keep descriptions concise and action-oriented.
+Your task:
+Generate a detailed, personalized step-by-step document update roadmap.
+
+Return ONLY a valid JSON array. Each item must have exactly these fields:
+- "step": sequential number starting from 1
+- "task": short title of the update (e.g. "Update Aadhaar Address")
+- "description": a thorough, helpful description of 4-6 sentences explaining:
+    * WHY this update is needed after relocation
+    * WHAT documents the user must carry or upload
+    * HOW to complete the process step by step (online or offline)
+    * Estimated fee and processing time if known
+- "link": the exact official government or banking portal URL for this task
+
+Rules:
+- Only include steps relevant to the questionnaire answers.
+- Cover Aadhaar, PAN, Passport, Voter ID, Driving Licence, Bank KYC, LPG address, and any other Indian documents relevant to the situation.
+- Use real official portal links (myaadhaar.uidai.gov.in, onlineservices.nsdl.com, portal2.passportindia.gov.in, voters.eci.gov.in, parivahan.gov.in, mylpg.in, digilocker.gov.in etc.).
+- Make descriptions practical and easy to follow for a non-technical user.
 - Number steps sequentially starting from 1.
-- If no updates are needed, return an empty JSON array.
-- Do not include markdown, code fences, comments, or extra text.
+- If no updates are needed, return an empty JSON array [].
+- Do NOT include markdown, code fences, or any text outside the JSON array.
 `;
 
 const extractJson = (text) => {
@@ -96,65 +102,130 @@ const staticFallbackRoadmap = (questionnaire) => {
         items.push({
             step: step++,
             task: 'Update Aadhaar Address',
-            description: 'Update your residential address on Aadhaar through the UIDAI self-service portal.',
+            description:
+                'Your Aadhaar card is the primary identity document in India and must always reflect your current residential address. ' +
+                'Log in to the myAadhaar portal using your Aadhaar number and the OTP sent to your registered mobile number, then select "Update Address Online". ' +
+                'Upload a valid address proof such as a recent utility bill, rent agreement, or bank passbook showing your new address. ' +
+                'The update is processed within 7–10 working days and you can download the revised e-Aadhaar from the portal itself. ' +
+                'If your mobile number is not registered, visit the nearest Aadhaar Enrolment Centre with original documents — the fee is ₹50.',
             link: 'https://myaadhaar.uidai.gov.in',
         });
         items.push({
             step: step++,
-            task: 'Update PAN Address',
-            description: 'Correct address details on PAN card via the NSDL online portal.',
+            task: 'Update PAN Card Address',
+            description:
+                'Although the PAN card does not print an address, updating your address with the Income Tax Department ensures all official tax notices and correspondence reach your new location. ' +
+                'Visit the NSDL PAN correction portal, fill Form 49A online, select "Changes or Correction in existing PAN data", and upload your updated Aadhaar as address proof. ' +
+                'You can also link your PAN with your Aadhaar on the Income Tax e-Filing portal (https://www.incometax.gov.in) to keep both records consistent. ' +
+                'The processing fee is approximately ₹107 for Indian addresses and the updated PAN card is dispatched within 15–20 working days.',
             link: 'https://www.onlineservices.nsdl.com/paam/endUserRegisterContact.html',
         });
         items.push({
             step: step++,
             task: 'Update Passport Address',
-            description: 'Re-issue your passport with updated address through the Passport Seva portal.',
+            description:
+                'An outdated address on your passport can cause complications at immigration checkpoints and during official identity verification. ' +
+                'Register on the Passport Seva portal, click "Apply for Re-issue of Passport", select "Change in Address" as the reason, and book an appointment at the nearest Passport Seva Kendra (PSK) or Post Office PSK. ' +
+                'Carry your current original passport, new address proof (Aadhaar or utility bill), and two passport-size photographs to the appointment. ' +
+                'The fee is ₹1,500 for normal processing (up to 30 days) or ₹2,000 for Tatkaal processing (1–3 working days). ' +
+                'Your updated passport booklet will be delivered to your new address via Speed Post.',
             link: 'https://portal2.passportindia.gov.in',
         });
         items.push({
             step: step++,
-            task: 'Update Voter ID Address',
-            description: 'Submit Form 8A on the National Voters\' Service Portal to update your address.',
+            task: 'Update Voter ID (EPIC) Address',
+            description:
+                'Your Voter ID must show your current address so you are assigned to the correct polling booth and constituency after relocation. ' +
+                'If you have moved within the same constituency, submit Form 8 (correction of entries) on the National Voters\' Service Portal. ' +
+                'If you have moved to a new constituency, submit Form 6 (registration in new constituency) and request deletion from the old one via Form 7. ' +
+                'Upload your updated Aadhaar or any valid current address proof and a recent passport-size photograph. ' +
+                'This process is completely free and is handled by the Electoral Registration Officer (ERO) — allow up to 30 days for the update to reflect.',
             link: 'https://voters.eci.gov.in',
         });
         items.push({
             step: step++,
             task: 'Update Driving Licence Address',
-            description: 'Update your address on Driving Licence through the Parivahan portal.',
+            description:
+                'An outdated address on your Driving Licence can create issues during traffic inspections and vehicle re-registration in your new city. ' +
+                'Log in to the Parivahan Sewa portal, navigate to "Driving Licence Services" → "DL Services" → "Change of Address", enter your new address, and upload your new address proof (Aadhaar, utility bill, or rent agreement). ' +
+                'Pay the fee online (₹200–₹450 depending on your state) and submit the application through your respective State RTO. ' +
+                'An updated DL card will be dispatched to your new address within 7–30 working days. ' +
+                'You can track your application status at any time using the Parivahan portal.',
             link: 'https://parivahan.gov.in',
+        });
+        items.push({
+            step: step++,
+            task: 'Update LPG Gas Connection Address',
+            description:
+                'Your LPG connection is linked to your previous address, and transferring it ensures uninterrupted subsidised cylinder supply at your new home. ' +
+                'Contact your existing LPG distributor (Indane, HP Gas, or Bharat Gas) to initiate a transfer request — carry your new address proof, Aadhaar, and latest paid LPG bill. ' +
+                'If there is no distributor tie-up nearby, surrender the existing connection and register a fresh one with a distributor in your new area. ' +
+                'Visit the mylpg.in portal to update your address online or to locate your nearest distributor. ' +
+                'A fresh connection requires a security deposit of ₹1,450–₹1,700 for the cylinder; transfers are generally free of charge.',
+            link: 'https://www.mylpg.in',
         });
     }
 
     if (questionnaire.bankUpdate || questionnaire.movedCity || questionnaire.addressChange) {
         items.push({
             step: step++,
-            task: 'Update Bank KYC',
-            description: 'Submit updated address proof and Aadhaar to your bank branch or net banking portal for KYC re-verification.',
-            link: 'https://www.rbi.org.in',
+            task: 'Update Bank KYC and Address',
+            description:
+                'Banks are legally required under RBI guidelines to maintain updated KYC records, and an outdated address can lead to temporary account restrictions or transaction limits. ' +
+                'Log in to your bank\'s net banking or mobile app and look for "Update Address" or "KYC Update" under Profile or Service Requests — many banks support Aadhaar OTP-based self-service address updates. ' +
+                'If the online option is unavailable, visit your home branch with the original updated Aadhaar, one additional address proof (utility bill or rent agreement), and a self-attested photocopy of each. ' +
+                'Repeat this update for every bank account you hold — savings, salary, fixed deposits, and joint accounts all need to be updated separately. ' +
+                'Allow 5–10 working days for the change to reflect in bank records and on all linked services like cheque books, statements, and debit card delivery.',
+            link: 'https://www.rbi.org.in/Scripts/FAQView.aspx?Id=92',
         });
     }
 
     if (questionnaire.nameChange) {
         items.push({
             step: step++,
-            task: 'Update Aadhaar Name',
-            description: 'Update your name on Aadhaar at the nearest Aadhaar Enrolment Centre with supporting documents.',
+            task: 'Update Name on Aadhaar',
+            description:
+                'A name change on Aadhaar is required after marriage, divorce, or a legal name change — all downstream documents depend on Aadhaar being correct. ' +
+                'This update must be done offline: visit the nearest Aadhaar Enrolment Centre (book an appointment at https://appointments.uidai.gov.in) with your current Aadhaar, a valid name-change document (marriage certificate, gazette notification, or court order), and a passport-size photograph. ' +
+                'Fill the Aadhaar Update/Correction form at the centre, pay the ₹50 fee, and collect your acknowledgement slip with an Update Request Number (URN). ' +
+                'Track the status of your update at https://myaadhaar.uidai.gov.in using the URN. ' +
+                'The name change is processed within 7–30 working days and the updated e-Aadhaar can be downloaded from the portal.',
             link: 'https://myaadhaar.uidai.gov.in',
         });
         items.push({
             step: step++,
-            task: 'Update PAN Name',
-            description: 'Submit a PAN correction request via NSDL with your name change document.',
+            task: 'Update Name on PAN Card',
+            description:
+                'Your PAN card must reflect your exact legal name as it appears on your court order, marriage certificate, or gazette notification to avoid mismatches during financial and tax operations. ' +
+                'Visit the NSDL PAN correction portal, choose "Changes or Correction in existing PAN data", select "Name" as the field to be corrected, and upload a self-attested copy of your name-change document. ' +
+                'Alternatively, use the UTIITSL portal at https://www.pan.utiitsl.com if you prefer that route. ' +
+                'The fee is ₹107 and your PAN number remains unchanged — only the name printed on the card is updated. ' +
+                'The corrected card is dispatched within 15–20 working days.',
             link: 'https://www.onlineservices.nsdl.com/paam/endUserRegisterContact.html',
+        });
+        items.push({
+            step: step++,
+            task: 'Update Name in Bank Records',
+            description:
+                'All your bank accounts must reflect your new legal name to avoid discrepancies during KYC checks, income tax filings, and financial transactions. ' +
+                'Visit your bank branch with the original name-change document (marriage certificate or gazette notification), your old and new PAN cards, and your updated Aadhaar. ' +
+                'Submit a Name Change Request Form along with self-attested photocopies of all supporting documents — some banks like HDFC, SBI, and ICICI also accept this request via their mobile banking app under "Profile Update" or "Service Requests". ' +
+                'Ensure you update all linked accounts — savings, salary, fixed deposits — as each may need a separate request. ' +
+                'Allow 5–10 working days for the change to reflect across all records.',
+            link: 'https://www.rbi.org.in',
         });
     }
 
     if (items.length === 0) {
         items.push({
             step: 1,
-            task: 'Review Documents',
-            description: 'No specific updates detected. Review all your identity documents to ensure details are current.',
-            link: 'https://myaadhaar.uidai.gov.in',
+            task: 'Review All Identity Documents',
+            description:
+                'No specific document updates were flagged based on your responses, but it is good practice to periodically verify that all your identity documents are consistent and up to date. ' +
+                'Check that your Aadhaar, PAN, Passport, Voter ID, Driving Licence, and bank records all carry the same name spelling, date of birth, and current address. ' +
+                'Use the DigiLocker app (https://www.digilocker.gov.in) to access all your government-issued documents securely in one place. ' +
+                'If you find any discrepancies, initiate corrections through the respective official portals listed above.',
+            link: 'https://www.digilocker.gov.in',
         });
     }
 
