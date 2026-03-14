@@ -1,7 +1,7 @@
 const express = require('express');
 const authMiddleware = require('../middleware/authMiddleware');
 const Roadmap = require('../models/Roadmap');
-const { generateRoadmap, normalizeQuestionnaire, normalizeUserData } = require('../services/geminiService');
+const { generateRoadmap, normalizeQuestionnaire, normalizeUserData } = require('../services/roadmapService');
 
 const router = express.Router();
 
@@ -99,9 +99,8 @@ router.post('/generate', authMiddleware, async (req, res) => {
             generatedRoadmap: roadmapItems,
         });
     } catch (err) {
-        console.error('Gemini roadmap generation error:', err);
-        const statusCode = err.message === 'GEMINI_API_KEY is not configured' ? 500 : 500;
-        res.status(statusCode).json({
+        console.error('Roadmap generation error:', err);
+        res.status(500).json({
             message: 'Failed to generate roadmap',
             error: err.message,
         });

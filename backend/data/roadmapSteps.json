@@ -1,0 +1,73 @@
+{
+    "addressChange": {
+        "rentAgreement": {
+            "task": "Create Notarized Rent Agreement",
+            "description": "Visit a local notary or attorney. Draft a standard rent agreement on ₹100 or ₹500 non-judicial stamp paper. Both landlord and tenant must sign, along with two witnesses. Get the document notarized. This will serve as your primary address proof.",
+            "link": "https://igrs.up.gov.in"
+        },
+        "aadhaar": {
+            "task": "Update Aadhaar Address",
+            "description": "Log in to myAadhaar (https://myaadhaar.uidai.gov.in). Select 'Address Update'. Upload your notarized rent agreement or recent utility bill. Pay the ₹50 fee. The update takes 7-10 working days.",
+            "link": "https://myaadhaar.uidai.gov.in"
+        },
+        "pan": {
+            "task": "Update PAN Card Address",
+            "description": "Visit the NSDL or UTIITSL portal. Submit Form 49A for changes/correction. Use your updated Aadhaar as base proof. Pay the ₹107 fee. Dispatched within 15-20 days.",
+            "link": "https://www.onlineservices.nsdl.com/paam/endUserRegisterContact.html"
+        },
+        "passport": {
+            "task": "Update Passport Address",
+            "description": "Apply for 'Re-issue of Passport' on the Passport Seva portal. Select 'Change in Address'. Book an appointment and take original documents (Aadhaar/Utility bill). Pay ₹1,500. Processing takes up to 30 days.",
+            "link": "https://portal2.passportindia.gov.in"
+        },
+        "voterId": {
+            "task": "Update Voter ID (EPIC) Address",
+            "description": "Submit Form 8 (same constituency) or Form 6 (new constituency) on National Voters' Service Portal. Upload updated Aadhaar. Expected to reflect within 30 days.",
+            "link": "https://voters.eci.gov.in"
+        },
+        "drivingLicence": {
+            "task": "Update Driving Licence Address",
+            "description": "Log into Parivahan Sewa. Navigate to 'DL Services' -> 'Change of Address'. Upload updated Aadhaar or rent agreement. Pay the online fee (varies by state). Delivery in 7-30 working days.",
+            "link": "https://parivahan.gov.in"
+        }
+    },
+    "nameChange": {
+        "affidavit": {
+            "task": "Obtain Name Change Affidavit",
+            "description": "Visit a local notary and an attorney. Draft an affidavit for name change (marriage, personal preference) on a ₹100 stamp paper. Provide old name, new name, father's/husband's name, and address. Get it attested by a First Class Judicial Magistrate or Notary Public.",
+            "link": ""
+        },
+        "newspaper": {
+            "task": "Publish Newspaper Advertisement",
+            "description": "Contact two different local newspapers (one regional language, one national English daily). Publish a small classified ad stating your name change along with old and new name details as per the affidavit. Retain 8-10 original copies of both newspapers.",
+            "link": ""
+        },
+        "gazette": {
+            "task": "Apply for Gazette Notification",
+            "description": "Print the prescribed application form. Submit the original affidavit, originally published newspaper clippings, self-attested photos, and identity proofs to the Department of Publication. This is the legal foundation for updating major documents.",
+            "link": "https://deptpub.gov.in"
+        },
+        "aadhaar": {
+            "task": "Update Name on Aadhaar",
+            "description": "Visit an Aadhaar Enrolment Centre. Submit the name update request. You MUST carry the original gazette notification or original marriage certificate. The fee is ₹50.",
+            "link": "https://myaadhaar.uidai.gov.in"
+        },
+        "pan": {
+            "task": "Update Name on PAN Card",
+            "description": "Submit a PAN Correction Form via NSDL/UTIITSL. Provide the original gazette notification or original marriage certificate along with the updated Aadhaar. Pay ₹107 fee.",
+            "link": "https://www.onlineservices.nsdl.com/paam/endUserRegisterContact.html"
+        },
+        "bank": {
+            "task": "Update Name in Bank Records",
+            "description": "Visit your home branch personally. Submit a formal application along with the gazette notification, updated Aadhaar, and updated PAN. Some banks require physical presence for signature updates.",
+            "link": "https://www.rbi.org.in"
+        }
+    },
+    "default": {
+        "review": {
+            "task": "Review All Identity Documents",
+            "description": "Although no specific updates were selected, review your Aadhaar, PAN, Passport, Voter ID, Driving Licence, and Bank details for consistency. Keep all connected on DigiLocker.",
+            "link": "https://www.digilocker.gov.in"
+        }
+    }
+}

@@ -27,7 +27,7 @@ const roadmapSchema = new mongoose.Schema({
         officialPortalLink: String,
         completed: { type: Boolean, default: false }
     }],
-    generatedBy: { type: String, default: 'gemini-2.0-flash' },
+    generatedBy: { type: String, default: 'local-rule-engine' },
     createdAt: { type: Date, default: Date.now }
 });
 

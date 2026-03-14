@@ -50,11 +50,19 @@ app.post('/api/automation/run', async (req, res) => {
                 dob = dateMatch ? dateMatch[0] : String(userData.dob).trim();
             }
 
-            const address = userData?.address || '123 Default Street, City';
+            let address = userData?.address || '123 Default Street, City';
+            if (address && typeof address === 'string') {
+                address = address.replace(/\n|\r/g, ', ').replace(/\s{2,}/g, ' ').trim();
+            }
+
+            const aadhaarNumber = userData?.aadhaarNumber || '1234 5678 9012';
+            const panNumber = userData?.panNumber || 'ABCDE1234F';
 
             await page.type('#fullName', name, typeDelay);
             await page.type('#dob', dob, typeDelay);
             await page.type('#address', address, typeDelay);
+            await page.type('#aadhaarNumber', aadhaarNumber, typeDelay);
+            await page.type('#panNumber', panNumber, typeDelay);
 
             // Check the disclaimer
             await page.click('#disclaimer');

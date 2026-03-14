@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Circle, ExternalLink, Play, FileText, ChevronRight } from 'lucide-react';
+import { CheckCircle2, Circle, ExternalLink, Play, FileText, ChevronRight, MapPin } from 'lucide-react';
 
 const Dashboard = () => {
     const [roadmap, setRoadmap] = useState(null);
@@ -53,7 +53,9 @@ const Dashboard = () => {
         const userData = {
             name: relevantDoc.extractedData.name,
             dob: relevantDoc.extractedData.dob,
-            address: relevantDoc.extractedData.address
+            address: relevantDoc.extractedData.address,
+            aadhaarNumber: relevantDoc.extractedData.aadhaarNumber,
+            panNumber: relevantDoc.extractedData.panNumber
         };
 
         alert(`Starting Auto-Fill for ${serviceName} using data from ${relevantDoc.documentType}...`);
@@ -140,23 +142,31 @@ const Dashboard = () => {
                                 </div>
 
                                 <div className="flex flex-col gap-2 items-end">
-                                    <a
-                                        href={item.officialPortalLink}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm font-medium rounded-lg transition-colors border border-gray-200"
-                                    >
-                                        Portal <ExternalLink className="h-3.5 w-3.5" />
-                                    </a>
+                                    {item.officialPortalLink && item.officialPortalLink.startsWith('http') ? (
+                                        <>
+                                            <a
+                                                href={item.officialPortalLink}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm font-medium rounded-lg transition-colors border border-gray-200"
+                                            >
+                                                Portal <ExternalLink className="h-3.5 w-3.5" />
+                                            </a>
 
-                                    <button
-                                        onClick={() => handleAutoFill(item)}
-                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-pink-50 hover:bg-pink-100 text-pink-700 text-sm font-semibold rounded-lg transition-colors border border-pink-200 shadow-sm"
-                                        title="Demonstrate Auto-fill via Puppeteer"
-                                        disabled={item.completed}
-                                    >
-                                        <Play className="h-3.5 w-3.5 fill-pink-600" /> Auto-Fill
-                                    </button>
+                                            <button
+                                                onClick={() => handleAutoFill(item)}
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-pink-50 hover:bg-pink-100 text-pink-700 text-sm font-semibold rounded-lg transition-colors border border-pink-200 shadow-sm"
+                                                title="Demonstrate Auto-fill via Puppeteer"
+                                                disabled={item.completed}
+                                            >
+                                                <Play className="h-3.5 w-3.5 fill-pink-600" /> Auto-Fill
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-600 text-sm font-medium rounded-lg border border-gray-200">
+                                            <MapPin className="h-3.5 w-3.5 text-gray-500" /> Offline Step
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </motion.div>

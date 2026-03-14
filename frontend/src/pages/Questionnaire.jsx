@@ -14,7 +14,7 @@ const Questionnaire = () => {
     });
     const [loading, setLoading] = useState(false);
 
-    const documentOptions = ['Aadhaar', 'PAN', 'Passport', 'Bank Account'];
+    const documentOptions = ['Aadhaar', 'PAN', 'Passport', 'Voter ID', 'Driving Licence', 'Bank Account'];
 
     const handleCheckbox = (field) => {
         setAnswers(prev => ({ ...prev, [field]: !prev[field] }));
