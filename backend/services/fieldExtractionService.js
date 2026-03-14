@@ -172,7 +172,7 @@ const { extractPanData } = require('./panExtractionService');
  *   documentType: string,
  *   extractedData: {
  *     name: string|null,
- *     dateOfBirth: string|null,
+ *     dob: string|null,
  *     gender: string|null,
  *     aadhaarNumber: string|null,
  *     panNumber: string|null,
@@ -186,7 +186,7 @@ const extractFields = (rawText) => {
 
     let extractedData = {
         name: extractName(rawText),
-        dateOfBirth: extractDOB(rawText),
+        dob: extractDOB(rawText),
         gender: extractGender(rawText),
         aadhaarNumber: extractAadhaar(rawText),
         panNumber: extractPan(rawText),

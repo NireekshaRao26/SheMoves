@@ -27,7 +27,7 @@ app.post('/api/automation/run', async (req, res) => {
             const browser = await puppeteer.launch({ headless: false, defaultViewport: null });
             const page = await browser.newPage();
 
-            const targetUrl = officialPortalLink || `http://localhost:${PORT}/demo-form.html`;
+            const targetUrl = `http://localhost:${PORT}/demo-form.html`;
             await page.goto(targetUrl, { waitUntil: 'networkidle2' });
 
             // Simulate human typing
@@ -42,11 +42,18 @@ app.post('/api/automation/run', async (req, res) => {
 
             // Fill user data if provided, otherwise use defaults
             const name = userData?.name || 'Jane Doe (Manual)';
-            const email = userData?.email || (userData?.dob ? `DOB: ${userData.dob}` : 'jane@example.com');
+            
+            let dob = '01/01/1990';
+            if (userData?.dob) {
+                // Extract only the date part (e.g. DD/MM/YYYY or DD-MM-YYYY)
+                const dateMatch = String(userData.dob).match(/\d{2}[\/\-]\d{2}[\/\-]\d{4}/);
+                dob = dateMatch ? dateMatch[0] : String(userData.dob).trim();
+            }
+
             const address = userData?.address || '123 Default Street, City';
 
             await page.type('#fullName', name, typeDelay);
-            await page.type('#email', email, typeDelay);
+            await page.type('#dob', dob, typeDelay);
             await page.type('#address', address, typeDelay);
 
             // Check the disclaimer

@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const authMiddleware = require('../middleware/authMiddleware');
 const Document = require('../models/Document');
+const User = require('../models/User');
 const { processImage } = require('../services/ocrService');
 
 const router = express.Router();
@@ -45,9 +46,9 @@ router.post('/', authMiddleware, upload.single('document'), async (req, res) => 
             name: extractedData.name || '',
             dob: extractedData.dateOfBirth || '',
             documentNumber: extractedData.aadhaarNumber || extractedData.panNumber || '',
-            address: '',
-            gender: '',
-            fatherName: '',
+            address: extractedData.address || '',
+            gender: extractedData.gender || '',
+            fatherName: extractedData.fatherName || '',
             rawText
         };
 
@@ -61,6 +62,35 @@ router.post('/', authMiddleware, upload.single('document'), async (req, res) => 
         });
 
         await documentRecord.save();
+
+        // Automatically update the user's profile with newly extracted data if they don't have it
+        try {
+            const user = await User.findById(req.user.userId);
+            if (user) {
+                let profileUpdated = false;
+                if (!user.profile) user.profile = {};
+
+                // Only overwrite if the profile field is empty but we extracted something
+                if (mappedData.dob && !user.profile.dob) { user.profile.dob = mappedData.dob; profileUpdated = true; }
+                if (mappedData.gender && !user.profile.gender) { user.profile.gender = mappedData.gender; profileUpdated = true; }
+                if (mappedData.address && !user.profile.address) { user.profile.address = mappedData.address; profileUpdated = true; }
+                if (mappedData.fatherName && !user.profile.fatherName) { user.profile.fatherName = mappedData.fatherName; profileUpdated = true; }
+                
+                if (extractedData.aadhaarNumber && !user.profile.aadhaarNumber) { user.profile.aadhaarNumber = extractedData.aadhaarNumber; profileUpdated = true; }
+                if (extractedData.panNumber && !user.profile.panNumber) { user.profile.panNumber = extractedData.panNumber; profileUpdated = true; }
+                
+                // If name is found but user.name was generic, maybe update user name?
+                // Currently keeping it simple and just updating 'profile'
+                
+                if (profileUpdated) {
+                    await user.save();
+                    console.log('User profile auto-updated from document upload');
+                }
+            }
+        } catch (profileErr) {
+            console.error('Error auto-updating user profile:', profileErr);
+            // Non-fatal error, let the upload succeed
+        }
 
         res.status(201).json({
             message: 'Document uploaded and analyzed successfully',

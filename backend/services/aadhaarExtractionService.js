@@ -52,10 +52,18 @@ const extractAadhaarData = (text) => {
             }
         }
 
-        // Address is usually 2-3 lines after the Aadhaar number line
-        if (aadhaarNumber && line.includes(aadhaarNumber) && i < lines.length - 1) {
-            const addressLines = lines.slice(i + 1, i + 4);
-            address = addressLines.join(" ").trim();
+        // Address extraction handles it afterwards
+    }
+
+    // 5. Extract Address (stop at 6 digit pincode to avoid QR code garbage)
+    const addressMatch = text.match(/(?:Address[:\-]?|S\/O[:\-]?|D\/O[:\-]?|C\/O[:\-]?|W\/O[:\-]?)[\s\S]*?\b\d{6}\b/i);
+    if (addressMatch) {
+        address = addressMatch[0].replace(/\n/g, ', ').replace(/,\s*,/g, ', ').trim();
+    } else {
+        // Fallback: look for a pincode and get a few lines before it
+        const pinMatch = text.match(/(?:[^\n]+\n){1,3}[^\n]*\b\d{6}\b/);
+        if (pinMatch) {
+            address = pinMatch[0].replace(/\n/g, ', ').replace(/,\s*,/g, ', ').trim();
         }
     }
 
@@ -84,7 +92,7 @@ const extractAadhaarData = (text) => {
 
     return {
         name,
-        dateOfBirth: dob,
+        dob: dob,
         gender,
         aadhaarNumber,
         address

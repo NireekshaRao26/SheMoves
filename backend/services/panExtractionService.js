@@ -52,42 +52,67 @@ const extractPanData = (text) => {
     }
 
     // 3. Extract Name and Father's Name using layout rules
-    // Rule: find the DOB line, the two lines above it are name and father's name
-    if (dob) {
-        for (let i = 0; i < lines.length; i++) {
-            if (lines[i].includes(dob)) {
-                if (i >= 2) {
-                    name = normalizeName(lines[i - 2]);
-                    fatherName = normalizeName(lines[i - 1]);
-                } else if (i === 1) {
-                    // Fallback: only father's name (or name if only one line exists)
-                    fatherName = normalizeName(lines[i - 1]);
+    // Filter out common header lines and empty lines
+    const skipKeywords = ["INCOME", "TAX", "DEPARTMENT", "INDIA", "PERMANENT", "ACCOUNT", "CARD", "GOVI", "GOVT", "SIGNATURE"];
+    
+    // First try template-specific extraction based on labels
+    for (let i = 0; i < lines.length; i++) {
+        const lineStr = lines[i].replace(/\s+/g, '').toUpperCase();
+        
+        // 1. Template extraction for Name
+        if (lineStr.includes("नाम/NAME") || lineStr.includes("NAME")) {
+            // The actual name is usually the very next line
+            if (i + 1 < lines.length && !name) {
+                const candidate = lines[i+1];
+                if (!/\d/.test(candidate) && candidate.length > 2) {
+                     name = normalizeName(candidate);
                 }
-                break;
+            }
+        }
+        
+        // 2. Template extraction for Father's Name
+        if (lineStr.includes("पिताकानाम/FATHER'SNAME") || lineStr.includes("FATHER")) {
+             // The actual father name is usually the very next line
+            if (i + 1 < lines.length && !fatherName) {
+                const candidate = lines[i+1];
+                if (!/\d/.test(candidate) && candidate.length > 2) {
+                     fatherName = normalizeName(candidate);
+                }
             }
         }
     }
+    
+    // Next, use positional fallback if template matching failed
+    // We only consider lines that are purely alphabetical (names) for name extraction
+    const nameCandidates = lines.filter((line, idx) => {
+        const upperLine = line.toUpperCase();
+        if (upperLine.length < 3) return false;
+        if (/\d/.test(line)) return false; // names don't have digits
+        
+        // Check if it's purely letters, spaces, dots, or hyphens
+        if (!/^[a-zA-Z\s\.\-]+$/i.test(line)) return false; 
+        
+        return !skipKeywords.some(keyword => upperLine.includes(keyword)) &&
+               !upperLine.includes("NAME") && !upperLine.includes("FATHER") &&
+               // We don't want to re-process lines we already identified as Name/Father via template
+               upperLine !== (name && name.toUpperCase()) && 
+               upperLine !== (fatherName && fatherName.toUpperCase());
+    });
 
-    // Fallback name extraction if layout rule failed
-    if (!name) {
-        // Try to find the first line that looks like a name and isn't a known keyword
-        const skipKeywords = ["INCOME TAX", "DEPARTMENT", "INDIA", "PERMANENT", "ACCOUNT", "CARD"];
-        for (const line of lines) {
-            const upperLine = line.toUpperCase();
-            if (!/\d/.test(line) && 
-                !skipKeywords.some(keyword => upperLine.includes(keyword)) &&
-                /^[A-Z\s]+$/i.test(line) &&
-                line.split(/\s+/).length >= 2) {
-                name = normalizeName(line);
-                break;
-            }
-        }
+    if (!name && nameCandidates.length > 0) {
+        name = normalizeName(nameCandidates[0]);
+        // Remove the chosen name from candidates so it doesn't get picked as father's name
+        nameCandidates.shift();
+    }
+    
+    if (!fatherName && nameCandidates.length > 0) {
+        fatherName = normalizeName(nameCandidates[0]);
     }
 
     return {
         name,
         fatherName,
-        dateOfBirth: dob,
+        dob: dob,
         panNumber
     };
 };

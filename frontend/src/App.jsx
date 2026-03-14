@@ -8,6 +8,7 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Questionnaire from './pages/Questionnaire';
 import DocumentUpload from './pages/DocumentUpload';
+import Profile from './pages/Profile';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -51,6 +52,7 @@ function App() {
         <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
         <Route path="/questionnaire" element={<ProtectedRoute><Layout><Questionnaire /></Layout></ProtectedRoute>} />
         <Route path="/upload" element={<ProtectedRoute><Layout><DocumentUpload /></Layout></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );

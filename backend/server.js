@@ -8,7 +8,7 @@ const uploadRoutes = require('./routes/upload');
 const roadmapRoutes = require('./routes/roadmap');
 const ocrRoutes = require('./routes/ocrRoutes');
 const automationRoutes = require('./routes/automation');
-const autofillRoutes = require('./routes/autofillRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,7 +23,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/roadmap', roadmapRoutes);
 app.use('/api/ocr', ocrRoutes);   // Mounts /api/ocr/extract
 app.use('/api/automation', automationRoutes);
-app.use('/api/autofill', autofillRoutes);
+app.use('/api/user', userRoutes);
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI)

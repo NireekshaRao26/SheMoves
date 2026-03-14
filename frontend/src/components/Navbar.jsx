@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { LogOut, Home, FileText, Upload } from 'lucide-react';
+import { LogOut, Home, FileText, Upload, User } from 'lucide-react';
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -40,6 +40,9 @@ const Navbar = () => {
 
                         <div className="flex items-center gap-4">
                             <span className="text-sm font-medium text-gray-700 hidden md:inline">Hi, {user.name}</span>
+                            <Link to="/profile" className="text-gray-600 hover:text-pink-600 flex items-center gap-1 transition-colors">
+                                <User className="h-4 w-4" /> <span className="hidden sm:inline">Profile</span>
+                            </Link>
                             <button
                                 onClick={handleLogout}
                                 className="flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-red-500 transition-colors"
