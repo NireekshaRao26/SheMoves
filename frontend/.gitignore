@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+output.txt
+output_utf8.txt
+test_ocr.js

@@ -57,26 +57,37 @@ const extractPanData = (text) => {
     
     // First try template-specific extraction based on labels
     for (let i = 0; i < lines.length; i++) {
+        // Just remove spaces for easier matching
         const lineStr = lines[i].replace(/\s+/g, '').toUpperCase();
         
         // 1. Template extraction for Name
         if (lineStr.includes("नाम/NAME") || lineStr.includes("NAME")) {
             // The actual name is usually the very next line
             if (i + 1 < lines.length && !name) {
-                const candidate = lines[i+1];
-                if (!/\d/.test(candidate) && candidate.length > 2) {
-                     name = normalizeName(candidate);
+                // To avoid grabbing noise on the same line, just grab the next line
+                const candidate = lines[i+1].trim();
+                // Check if candidate line doesn't have too many numbers and looks like a valid name
+                if (!/\d{3,}/.test(candidate) && candidate.length > 2) {
+                    // Extract just the alphabetical name portion (stripping trailing noise)
+                    const cleanMatch = candidate.match(/^[a-zA-Z\s\.]+/);
+                    if (cleanMatch) {
+                        name = normalizeName(cleanMatch[0].trim());
+                    }
                 }
             }
         }
         
         // 2. Template extraction for Father's Name
-        if (lineStr.includes("पिताकानाम/FATHER'SNAME") || lineStr.includes("FATHER")) {
+        if (lineStr.includes("पिताकानाम/FATHER'SNAME") || lineStr.includes("FATHER") || lineStr.includes("FATHER'SNAME")) {
              // The actual father name is usually the very next line
             if (i + 1 < lines.length && !fatherName) {
-                const candidate = lines[i+1];
-                if (!/\d/.test(candidate) && candidate.length > 2) {
-                     fatherName = normalizeName(candidate);
+                const candidate = lines[i+1].trim();
+                if (!/\d{3,}/.test(candidate) && candidate.length > 2) {
+                    // Extract just the alphabetical name portion (stripping trailing noise)
+                    const cleanMatch = candidate.match(/^[a-zA-Z\s\.]+/);
+                    if (cleanMatch) {
+                        fatherName = normalizeName(cleanMatch[0].trim());
+                    }
                 }
             }
         }

@@ -1,0 +1,52 @@
+﻿Testing OCR with most recent image: C:\Users\nireeksha\OneDrive\Documents\ocr\backend\uploads\1773459626772.jpeg
+Preprocessed image saved to: C:\Users\nireeksha\OneDrive\Documents\ocr\backend\uploads\processed_1773460262285.png
+
+OCR progress: 0%
+OCR progress: 3%
+OCR progress: 6%
+OCR progress: 10%
+OCR progress: 13%
+OCR progress: 16%
+OCR progress: 20%
+OCR progress: 23%
+OCR progress: 27%
+OCR progress: 30%
+OCR progress: 33%
+OCR progress: 37%
+OCR progress: 40%
+OCR progress: 43%
+OCR progress: 47%
+OCR progress: 50%
+OCR progress: 54%
+OCR progress: 57%
+OCR progress: 60%
+OCR progress: 64%
+OCR progress: 67%
+OCR progress: 100%
+Tesseract OCR complete.
+
+================ RAW TESSERACT TEXT =================
+
+2)
+eld GOVERNMENT OF AADHAAR
+Eres
+
+Nishitha Shetty
+DOB: 25/08/1990
+, Gender: Male op =]
+; 1234 5678 9012 iat 3
+: 12, Park Street wis; i
+Kolkata, West Bengal - 700016
+AER ΓÇö-9gdlΓÇö 9d
+
+================ EXTRACTED FIELDS =================
+
+{
+  "name": "Nishitha Shetty",
+  "dob": "25/08/1990",
+  "gender": "Male",
+  "aadhaarNumber": "1234 5678 9012",
+  "panNumber": null,
+  "passportNumber": null,
+  "address": "3, : 12, Park Street wis i, Kolkata, West Bengal - 700016"
+}

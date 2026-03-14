@@ -56,14 +56,46 @@ const extractAadhaarData = (text) => {
     }
 
     // 5. Extract Address (stop at 6 digit pincode to avoid QR code garbage)
-    const addressMatch = text.match(/(?:Address[:\-]?|S\/O[:\-]?|D\/O[:\-]?|C\/O[:\-]?|W\/O[:\-]?)[\s\S]*?\b\d{6}\b/i);
+    // We want to capture from a known address marker down to the pincode.
+    // However, we MUST use a non-greedy match and avoid capturing across too many lines
+    // to prevent it from grabbing the entire card (like Name, DOB, Gender) if the layout is weird.
+    
+    // Attempt 1: Explicit markers
+    const addressMatch = text.match(/(?:Address[:\-]?|S\/O[:\-]?|D\/O[:\-]?|C\/O[:\-]?|W\/O[:\-]?)[\s\S]{10,150}?\b\d{6}\b/i);
+    
     if (addressMatch) {
-        address = addressMatch[0].replace(/\n/g, ', ').replace(/,\s*,/g, ', ').trim();
+        // Clean up the match by removing the marker itself if it's "Address"
+        let addr = addressMatch[0].replace(/Address[:\-]?\s*/i, '');
+        // Also strip out any accidentally captured Gender or Aadhaar number noise
+        addr = addr.replace(/Gender[\s\S]*?(?:Male|Female|Transgender).*?(?=\n|$)/i, '')
+                   .replace(/\b\d{4}\s\d{4}\s\d{4}\b/g, '')
+                   .replace(/[\=\;\|\[\]]/g, ''); // Remove common OCR garbage characters
+                   
+        address = addr.replace(/\n/g, ', ').replace(/,\s*,/g, ', ').trim();
+        // Finally, strip stray starting artifacts (like "ddress", "iat", leading commas)
+        address = address.replace(/^(?:ddress|address|addr|iat|op)[,\s\:\.\-]*/i, '').replace(/^[,:\s\-]+/, '');
     } else {
-        // Fallback: look for a pincode and get a few lines before it
-        const pinMatch = text.match(/(?:[^\n]+\n){1,3}[^\n]*\b\d{6}\b/);
+        // Fallback: If no explicit marker, look for a 6-digit pincode and grab the 2-3 lines immediately preceding it.
+        // We use a more constrained regex here so it doesn't accidentally grab the top of the card.
+        const pinMatch = text.match(/([^\n]+\n){1,3}([^\n]*\b\d{6}\b)/);
         if (pinMatch) {
-            address = pinMatch[0].replace(/\n/g, ', ').replace(/,\s*,/g, ', ').trim();
+            let addr = pinMatch[0];
+            addr = addr.replace(/Gender[\s\S]*?(?:Male|Female|Transgender).*?(?=\n|$)/i, '')
+                       .replace(/\b\d{4}\s\d{4}\s\d{4}\b/g, '')
+                       .replace(/[\=\;\|\[\]]/g, '');
+                       
+            address = addr.replace(/\n/g, ', ').replace(/,\s*,/g, ', ').trim();
+            // Finally, strip stray starting artifacts. 
+            // Since Tesseract OCR can introduce completely random combinations of chars ("iat 3", "t 3", "wis;"),
+            // the safest way to start an Indian address cleanly is to drop everything before the first comma,
+            // or drop everything before the first digit (like a house number).
+            
+            // First pass: strip explicitly known garbage
+            address = address.replace(/^(?:ddress|address|addr|iat|op|wis|wwis|ww|t\s?\d?)[,\s\:\.\-\d]*/i, '');
+            // Second pass: aggressively trim all text at the very beginning that doesn't look like part of an address.
+            // Addresses almost always start with a number (house/flat/plot) or a capitalized block name.
+            // This regex strips any lowercase letters, loose punctuation, and spaces at the start.
+            address = address.replace(/^[^A-Z0-9]+/, '');
         }
     }
 
