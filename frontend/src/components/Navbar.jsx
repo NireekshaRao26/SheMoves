@@ -21,7 +21,7 @@ const Navbar = () => {
                 <div className="flex justify-between items-center h-16">
                     <div className="flex items-center gap-2">
                         <Link to="/dashboard" className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
-                            RelocateHer
+                            SheMoves
                         </Link>
                     </div>
 
