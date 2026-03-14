@@ -125,7 +125,7 @@ const Dashboard = () => {
                                     </div>
 
                                     {item.description && (
-                                        <p className={`text-sm leading-relaxed mt-2 mb-3 ${item.completed ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        <p className={`text-sm leading-relaxed whitespace-pre-line mt-2 mb-3 ${item.completed ? 'text-gray-400' : 'text-gray-600'}`}>
                                             {item.description}
                                         </p>
                                     )}

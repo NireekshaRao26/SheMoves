@@ -1,6 +1,8 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const GEMINI_MODEL = 'gemini-2.0-flash';
+const MAX_DESCRIPTION_BULLETS = 3;
+const MAX_BULLET_WORDS = 14;
 
 const cleanText = (value) => {
     if (value === undefined || value === null) {
@@ -9,6 +11,47 @@ const cleanText = (value) => {
 
     const normalized = String(value).trim();
     return normalized || null;
+};
+
+const clampWords = (text, maxWords = MAX_BULLET_WORDS) => {
+    const words = String(text || '')
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+
+    if (words.length === 0) {
+        return null;
+    }
+
+    return words.slice(0, maxWords).join(' ');
+};
+
+const toBulletDescription = (value, fallbackText = 'Complete this document update using official portal instructions.') => {
+    const baseText = cleanText(value) || fallbackText;
+
+    const normalizedLines = baseText
+        .split(/\r?\n/)
+        .map((line) => line.replace(/^[-*\u2022]\s*/, '').trim())
+        .filter(Boolean);
+
+    const sentenceChunks = normalizedLines.length
+        ? normalizedLines
+        : baseText
+              .split(/(?<=[.!?])\s+/)
+              .map((line) => line.trim())
+              .filter(Boolean);
+
+    const bullets = sentenceChunks
+        .map((line) => line.replace(/[.!?]+$/g, '').trim())
+        .map((line) => clampWords(line))
+        .filter(Boolean)
+        .slice(0, MAX_DESCRIPTION_BULLETS);
+
+    if (bullets.length === 0) {
+        return `- ${fallbackText}`;
+    }
+
+    return bullets.map((line) => `- ${line}`).join('\n');
 };
 
 const normalizeUserData = (userData = {}) => ({
@@ -36,23 +79,20 @@ Questionnaire answers:
 ${JSON.stringify(questionnaire, null, 2)}
 
 Your task:
-Generate a detailed, personalized step-by-step document update roadmap.
+Generate a concise, personalized step-by-step document update roadmap.
 
 Return ONLY a valid JSON array. Each item must have exactly these fields:
 - "step": sequential number starting from 1
 - "task": short title of the update (e.g. "Update Aadhaar Address")
-- "description": a thorough, helpful description of 4-6 sentences explaining:
-    * WHY this update is needed after relocation
-    * WHAT documents the user must carry or upload
-    * HOW to complete the process step by step (online or offline)
-    * Estimated fee and processing time if known
+- "description": 2-3 SHORT bullet points only, each max 8-14 words, using '-' prefix and newline separators
 - "link": the exact official government or banking portal URL for this task
 
 Rules:
 - Only include steps relevant to the questionnaire answers.
 - Cover Aadhaar, PAN, Passport, Voter ID, Driving Licence, Bank KYC, LPG address, and any other Indian documents relevant to the situation.
 - Use real official portal links (myaadhaar.uidai.gov.in, onlineservices.nsdl.com, portal2.passportindia.gov.in, voters.eci.gov.in, parivahan.gov.in, mylpg.in, digilocker.gov.in etc.).
-- Make descriptions practical and easy to follow for a non-technical user.
+- Keep descriptions concise and practical for a non-technical user.
+- Do not write paragraph descriptions.
 - Number steps sequentially starting from 1.
 - If no updates are needed, return an empty JSON array [].
 - Do NOT include markdown, code fences, or any text outside the JSON array.
@@ -88,7 +128,7 @@ const validateRoadmap = (roadmap) => {
     return roadmap.map((item, index) => ({
         step: Number(item.step) || index + 1,
         task: cleanText(item.task) || `Step ${index + 1}`,
-        description: cleanText(item.description) || 'Complete the required update for this relocation step.',
+        description: toBulletDescription(item.description, 'Complete the required update for this relocation step.'),
         link: cleanText(item.link) || 'https://www.google.com',
     }));
 };
@@ -229,7 +269,10 @@ const staticFallbackRoadmap = (questionnaire) => {
         });
     }
 
-    return items;
+    return items.map((item) => ({
+        ...item,
+        description: toBulletDescription(item.description, 'Complete the required update for this relocation step.'),
+    }));
 };
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -241,9 +284,12 @@ const callGeminiWithRetry = async (model, prompt, maxRetries = 3) => {
             return result.response.text();
         } catch (err) {
             const is429 = err.message && err.message.includes('429');
-            if (is429 && attempt < maxRetries) {
-                const waitMs = attempt * 8000; // 8s, 16s, 24s
-                console.warn(`Gemini rate-limited (429). Retrying in ${waitMs / 1000}s (attempt ${attempt}/${maxRetries})`);
+            if (is429) {
+                console.warn(`Gemini rate-limited (429). Falling back immediately...`);
+                throw err;
+            } else if (attempt < maxRetries) {
+                const waitMs = attempt * 3000;
+                console.warn(`Gemini network error. Retrying in ${waitMs / 1000}s (attempt ${attempt}/${maxRetries})`);
                 await sleep(waitMs);
             } else {
                 throw err;
