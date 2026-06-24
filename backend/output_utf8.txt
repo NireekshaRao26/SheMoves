@@ -25,28 +25,4 @@ OCR progress: 67%
 OCR progress: 100%
 Tesseract OCR complete.
 
-================ RAW TESSERACT TEXT =================
 
-2)
-eld GOVERNMENT OF AADHAAR
-Eres
-
-Nishitha Shetty
-DOB: 25/08/1990
-, Gender: Male op =]
-; 1234 5678 9012 iat 3
-: 12, Park Street wis; i
-Kolkata, West Bengal - 700016
-AER ΓÇö-9gdlΓÇö 9d
-
-================ EXTRACTED FIELDS =================
-
-{
-  "name": "Nishitha Shetty",
-  "dob": "25/08/1990",
-  "gender": "Male",
-  "aadhaarNumber": "1234 5678 9012",
-  "panNumber": null,
-  "passportNumber": null,
-  "address": "3, : 12, Park Street wis i, Kolkata, West Bengal - 700016"
-}
